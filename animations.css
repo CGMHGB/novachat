@@ -1,0 +1,436 @@
+/* =========================================================
+   NovaChat — Motion & Visual Polish Layer
+   Loaded after styles.css. Every animation is disabled under
+   prefers-reduced-motion (see bottom of file).
+   ========================================================= */
+
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+::selection {
+  background: rgba(139, 92, 246, 0.28);
+}
+
+/* ---------- Thin, elegant scrollbars ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(127, 127, 127, 0.25) transparent;
+}
+
+/* ---------- Film grain overlay (adds a premium, tactile texture) ---------- */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] body::after {
+  opacity: 0.05;
+}
+
+/* ---------- Drifting aurora glows ---------- */
+.glow-1 { animation: drift-1 22s ease-in-out infinite alternate; }
+.glow-2 { animation: drift-2 26s ease-in-out infinite alternate; }
+.glow-3 { animation: drift-3 19s ease-in-out infinite alternate; }
+
+@keyframes drift-1 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(90px, 60px) scale(1.12); }
+  100% { transform: translate(-60px, 110px) scale(0.95); }
+}
+@keyframes drift-2 {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-110px, -50px) scale(1.08); }
+  100% { transform: translate(40px, -120px) scale(1.15); }
+}
+@keyframes drift-3 {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-80px, 70px) scale(1.2); }
+}
+
+/* =========================================================
+   EMPTY STATE HERO
+   ========================================================= */
+.empty-hero > * {
+  animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.empty-hero > *:nth-child(2) { animation-delay: 0.12s; }
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Orb: rotating conic halo + expanding ripple */
+.hero-orb {
+  width: 58px;
+  height: 58px;
+  isolation: isolate;
+}
+
+.hero-orb::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(from var(--angle), transparent 0deg, #60a5fa 90deg, #c084fc 180deg, #f472b6 250deg, transparent 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+          mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+  animation: spin-angle 3.2s linear infinite;
+  z-index: -1;
+}
+
+.hero-orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(129, 140, 248, 0.55);
+  animation: ripple 2.8s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+.orb-inner {
+  animation: orb-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes spin-angle {
+  to { --angle: 360deg; }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 14px #818cf8; }
+  50%      { transform: scale(1.25); box-shadow: 0 0 26px #a78bfa; }
+}
+
+/* Greeting: slow flowing gradient shimmer */
+.gradient-text {
+  background-size: 220% auto !important;
+  animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both,
+             text-flow 7s ease-in-out infinite;
+}
+
+@keyframes text-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+.message-row.animate-in {
+  animation: msg-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--stagger, 0ms);
+}
+
+.message-row.user.animate-in {
+  animation-name: msg-in-user;
+}
+
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(12px); filter: blur(4px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@keyframes msg-in-user {
+  from { opacity: 0; transform: translate(14px, 8px) scale(0.97); filter: blur(3px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* User bubble: soft tinted gradient */
+.message-row.user .message-bubble {
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.09), rgba(139, 92, 246, 0.09)),
+    var(--bg-bubble-user);
+  border-color: rgba(99, 102, 241, 0.16);
+}
+
+/* Typing indicator (shown before the first token arrives) */
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+}
+
+.typing-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+.typing-dots i:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dot-bounce {
+  0%, 60%, 100% { transform: translateY(0) scale(0.85); opacity: 0.45; }
+  30%           { transform: translateY(-6px) scale(1); opacity: 1; }
+}
+
+.streaming-cursor:has(.typing-dots)::after {
+  display: none;
+}
+
+/* Smoother caret */
+.streaming-cursor::after {
+  content: '';
+  width: 7px;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #60a5fa, #a78bfa);
+  animation: caret-pulse 1s ease-in-out infinite;
+}
+
+@keyframes caret-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.2; }
+}
+
+/* Action links slide up gently on hover */
+.message-actions {
+  transform: translateY(-3px);
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.message-row:hover .message-actions {
+  transform: none;
+}
+
+/* Code blocks lift slightly on hover */
+.markdown-body pre {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.markdown-body pre:hover {
+  transform: translateY(-1px);
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+/* =========================================================
+   COMPOSER — rotating gradient border on focus
+   ========================================================= */
+.composer-box {
+  position: relative;
+}
+
+.composer-box::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--angle), #3b82f6, #8b5cf6, #ec4899, #f59e0b, #3b82f6);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: spin-angle 4s linear infinite;
+  pointer-events: none;
+}
+
+.composer-box:focus-within {
+  border-color: transparent;
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.16);
+}
+
+.composer-box:focus-within::before {
+  opacity: 1;
+}
+
+/* Send button: glow + springy press */
+.send-btn {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.send-btn:not(:disabled) {
+  animation: send-ready 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.send-btn:hover:not(:disabled) {
+  transform: scale(1.08) rotate(-8deg);
+  box-shadow: 0 4px 18px rgba(99, 102, 241, 0.5);
+}
+
+.send-btn:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+@keyframes send-ready {
+  from { transform: scale(0.7); }
+  to   { transform: scale(1); }
+}
+
+/* Stop button: pulsing ring */
+.stop-btn {
+  position: relative;
+}
+.stop-btn::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(239, 68, 68, 0.55);
+  animation: ripple 1.6s ease-out infinite;
+}
+
+/* Tool buttons */
+.tool-btn svg,
+.icon-btn svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tool-btn:hover svg,
+.icon-btn:hover svg {
+  transform: scale(1.12);
+}
+#themeToggleBtn:hover svg {
+  transform: rotate(-25deg) scale(1.12);
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+.new-chat-btn svg {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.new-chat-btn:hover svg {
+  transform: rotate(90deg);
+}
+
+.chat-item {
+  position: relative;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.2s ease;
+}
+.chat-item:hover {
+  transform: translateX(2px);
+}
+
+.chat-item.active::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  animation: bar-grow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Status dot heartbeat when ready */
+.status-dot.ready {
+  animation: heartbeat 2.4s ease-in-out infinite;
+}
+@keyframes heartbeat {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  50%      { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+}
+
+.brand-spark {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.brand:hover .brand-spark {
+  transform: rotate(180deg) scale(1.08);
+}
+
+/* Model pill: subtle lift */
+.model-pill {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.model-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+}
+
+/* =========================================================
+   MODALS & TOASTS
+   ========================================================= */
+.modal-dialog[open] {
+  animation: modal-in 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-dialog[open]::backdrop {
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.tab-btn {
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.tab-btn:active {
+  transform: scale(0.96);
+}
+
+.mini-pill {
+  transition: all 0.18s ease;
+}
+.mini-pill:hover {
+  transform: translateY(-1px);
+}
+
+.primary-btn {
+  background-size: 200% 100% !important;
+  background-image: linear-gradient(110deg, #3b82f6, #6366f1 40%, #8b5cf6 60%, #3b82f6) !important;
+  transition: background-position 0.5s ease, transform 0.15s ease;
+}
+.primary-btn:hover {
+  background-position: 100% 0;
+}
+.primary-btn:active {
+  transform: scale(0.97);
+}
+
+.toast {
+  animation: toast-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-top: 8px;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(24px) scale(0.95); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* =========================================================
+   THEME SWITCH — circular reveal (View Transitions API)
+   ========================================================= */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* =========================================================
+   ACCESSIBILITY — respect reduced motion
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

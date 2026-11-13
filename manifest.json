@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "NovaChat — AI 對話側邊欄",
+  "version": "1.0.0",
+  "description": "自訂串接 xAI Grok、OpenAI、Gemini、Claude 與 Ollama 的輕量 AI 側邊欄工具",
+  "permissions": [
+    "sidePanel",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.x.ai/*",
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.deepseek.com/*",
+    "https://openrouter.ai/*",
+    "http://localhost:11434/*"
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "action": {
+    "default_title": "開啟 NovaChat AI 側邊欄"
+  }
+}
